@@ -1,0 +1,582 @@
+<nav class="navbar navbar-light bg-light fixed-top">
+  <span style="font-size: 2vw;font-family: serif;">{{_heading}}</span>
+  <button type="button"
+          class="btn btn-outline-primary"
+          (click)="Dashboard()">
+    {{_dashboard}}
+  </button>
+</nav>
+<div class="container-fluid" style="margin-top: 4%;font-family: Serif,serif">
+  <div class="row">
+    <div class="col-3">
+      <div class="box-design">
+        <button
+          type="button"
+          class="btn btn-outline-info"
+          data-toggle="modal"
+          data-target="#createIssue">
+          {{_createIssue}}
+        </button>
+        <button type="button"
+                class="btn btn-outline-warning"
+                data-toggle="modal"
+                style="margin-left: 1%"
+                data-target="#masterSolution" (click)="masterSolution()">
+          {{_createSolution}}
+        </button>
+      </div>
+    </div>
+    <div class="col-9">
+      <div id="searchByImei">
+        <div class="form-group">
+          <label for="searchImei"></label>
+          <input type="text"
+                 class="form-control"
+                 id="searchImei"
+                 [(ngModel)]="_searchImeiValue"
+                 placeholder="{{_searchByImei}}"/>
+        </div>
+      </div>
+      <div class="details">
+        <div class="card">
+          <div class="card-body">
+            <table class="table table-striped " style="margin-bottom: 20px">
+              <thead>
+              <tr>
+                <th><b>{{_tableColNameIMEI}}</b></th>
+                <th><b>{{_tableColNameModelName}}</b></th>
+                <th><b>{{_tableColNameRemark}}</b></th>
+                <th><b>{{_tableColNameAction}}</b></th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let unAssignModel of _unAssignedModels | imeiSearch : _searchImeiValue">
+                <td *ngIf="unAssignModel.service_center === 2">{{unAssignModel.product_imei_1}}</td>
+                <td *ngIf="unAssignModel.service_center === 2">{{unAssignModel.model_name}}</td>
+                <td *ngIf="unAssignModel.service_center === 2">{{unAssignModel.remarks}}</td>
+                <td *ngIf="unAssignModel.service_center === 2">
+                  <button
+                    class="btn btn-outline-dark btn-sm"
+                    type="submit"
+                    (click)="open(unAssignModel.product_imei_1)">
+                    {{_tableButtonNameVendor}}
+                  </button>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Vendor select model start-->
+<div class="modal fade"
+     id="exampleModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header"
+           style="background-color: #4CAF50;
+           border-radius: 0;
+           padding: 10px;
+           color: white;">
+        <h5 class="modal-title" id="exampleModalLabel">Add Issue</h5>
+        <button type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close" (click)="okayGo()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="vendorAssign" [style.display]="_displayCount === 0 ? 'block': 'none'">
+
+          <form>
+            <div id="issueModal" style="border: 1px solid lightgray">
+              <div class="form-group" style="padding: 20px">
+                <label for="issueDropDown">Select Issue</label>
+                <select class="form-control" id="issueDropDown">
+                  <option>1</option>
+                  <option>2</option>
+                  <option>3</option>
+                  <option>4</option>
+                  <option>5</option>
+                </select>
+              </div>
+              <button
+                type="button" style="float: right"
+                class="btn btn-raised btn-info">
+                {{_nextButton}}
+              </button>
+            </div>
+
+          </form>
+
+          <!--<div class="row" style="padding: 10px">
+            <div class="col-12">
+              <div>
+                <div class="form-group">
+                  <label for="search"></label>
+                  <input type="text"
+                         class="form-control"
+                         id="search"
+                         [(ngModel)]="_searchValue"
+                         placeholder="{{_searchByName}}"/>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-3" style="margin-bottom: 10px"
+                     *ngFor="let vendor of _vendors | dataFilter: _searchValue">
+                  <div class="card" (click)="setVendorName(vendor.vendor_id)"
+                       style="padding: 10px;
+                                font-size: 1vw;
+                                font-family: Serif,serif;
+                                cursor: pointer;
+                                height: 50px;
+                                text-align: center">
+                    <span>{{vendor.first_name + " " + vendor.last_name}}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>-->
+
+
+        </div>
+        <div id="issueAndCost" [style.display]="_displayCount === 1? 'block': 'none'">
+
+          <div *ngIf="_previousIssues.length !== 0">
+            <div class="row alert alert-primary"
+                 *ngFor="let previousIssue of _previousIssues"
+                 style="padding: 10px;font-size: 1vw;color: gray;border-radius: 4px">
+              <div class="col-6">
+                {{previousIssue['issue_details']}}
+              </div>
+              <div class="col-6" style="text-align: center">
+                {{previousIssue['repair_cost']}}
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="_previousIssues.length === 0"
+               class="alert alert-success" style="border-radius: 4px">
+            <span>{{_noPreviousIssues}}</span>
+          </div>
+
+
+          <form class="form" [formGroup]="ModelForm">
+            <div formArrayName="details"
+                 *ngFor="let other of ModelForm.get('details')['controls'];let i = index">
+
+              <div [formGroupName]="i">
+
+                <div class="row" style="padding: 10px; border-radius: 2px;margin-bottom: 2%">
+                  <div class="col-6">
+                    <!--<div class="input-group mb-3">
+                      <input type="text"
+                             class="form-control"
+                             placeholder="{{issue}}"
+                             aria-label="Username"
+                             formControlName="issue_details"
+                             required
+                             aria-describedby="basic-addon1">
+                    </div>-->
+
+                    <div class="form-group">
+                      <select class="form-control" id="exampleSelect1">
+                        <option>Add Issue</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                      </select>
+                    </div>
+
+                  </div>
+                  <div class="col-6">
+                    <div class="input-group mb-3">
+                      <input type="text"
+                             class="form-control"
+                             placeholder="{{costing}}"
+                             aria-label="Username"
+                             formControlName="repair_cost"
+                             required
+                             aria-describedby="basic-addon1">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <button type="button"
+                        class="btn btn-outline-info"
+                        style="margin-top: 5%; margin-left: 53%"
+                        (click)="addAlternateModels()">
+                  {{addIssue}}
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button"
+                        class="btn btn-raised btn-info"
+                        style="margin-top: 5%;"
+                        (click)="submitIssueAndCost();">
+                  {{addIssueSubmit}}
+                </button>
+              </div>
+            </div>
+          </form>
+          <!-- {{ModelForm.value | json}}-->
+        </div>
+        <!--display division start-->
+
+        <div [style.display]="_displayCount === 3 ? 'block': 'none'">
+
+          <div *ngIf="_isSubmitted === 1" class="alert alert-success" role="alert">
+            {{_record}}
+          </div>
+
+          <div *ngIf="_isSubmitted === 0" class="alert alert-danger" role="alert">
+            {{_wrong}}
+          </div>
+
+          <button type="button"
+                  class="btn btn-raised btn-info"
+                  style="margin-top: 5%;"
+                  (click)="okayGo();">
+            {{_ok}}
+          </button>
+
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--Vendor select model end-->
+
+<!--create issue modal start-->
+
+
+<div class="modal fade"
+     id="createIssue"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="createIssueLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"
+         style="font-family: Serif,serif;">
+      <div class="modal-header modal-header-design">
+        <b class="modal-title"
+           id="createIssueLabel"
+           style="font-size: 1.5vw">
+          {{_createIssue}}
+        </b>
+      </div>
+      <div class="modal-body" style="border: 1px solid lightgray">
+        <div [style.display]="_isIssueSubmitted === 0 ? 'block': 'none'">
+          <div class="alert alert-danger"
+               [style.display]="_isIssueSubmitted === 1 ? 'block' : 'none'">
+            {{_errorMessage}}
+          </div>
+          <form [formGroup]="createIssueForm">
+
+            <div class="form-group">
+              <label for="issueDetails"
+                     class="bmd-label-floating" [style.color]="_issueDetailsError ? 'red' : ''">
+                {{_addEstimate | titlecase}}
+              </label>
+              <input type="text"
+                     class="form-control"
+                     placeholder=""
+                     formControlName="issueDetails"
+                     id="issueDetails">
+              <span [style.display]="_issueDetailsError ? 'block': 'none'"
+                    style="color: red;">
+            {{_validationMessage}}
+          </span>
+            </div>
+            <div class="issue-type-div"
+                 [style.border]="_issueTypeError ? '1px solid red' : '1px solid lightgray'">
+              <div class="row">
+                <div class="col-6">
+                  <div class="card issue-type-card"
+                       (click)="getIssuesType('Cosmetic')"
+                       [style.background]=" _setIssueType === 'Cosmetic' ? '#DCEDC8': 'white'">
+                    {{_cosmetic}}
+                  </div>
+                </div>
+                <div class="col-6">
+                  <div class="card issue-type-card"
+                       (click)="getIssuesType('Operational')"
+                       [style.background]=" _setIssueType === 'Operational' ? '#DCEDC8': 'white'">
+                    {{_operation}}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div [style.display]="_issueTypeError ? 'block': 'none'">
+              <span style="color: red">{{_selectOneOption}}</span>
+            </div>
+            <div style="margin-top: 5%">
+              <button type="button"
+                      class="btn btn-outline-danger btm-sm"
+                      data-dismiss="modal" style="margin-right: 1%;margin-left: 62%"
+                      (click)="reload()">
+                {{_close}}
+              </button>
+              <button type="button"
+                      class="btn btn-outline-info" (click)="issueDetailsForm()">
+                {{_submitButton}}
+              </button>
+            </div>
+          </form>
+        </div>
+        <div class="alert alert-success"
+             [style.display]="_isIssueSubmitted === 2 ? 'block' : 'none'">
+          {{_issueAddedSuccessfully}}<br>
+          <div style="float: right; margin-top: 6%">
+            <button type="button"
+                    class="btn btn-outline-success"
+                    style="margin-left: 37%"
+                    (click)="reload()">
+              {{_ok}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--create issue modal end-->
+
+<!--create solution modal start-->
+
+<div class="modal fade"
+     id="masterSolution"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="masterSolutionLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="font-family: Serif,serif">
+      <div class="modal-header modal-header-design">
+        <b class="modal-title" id="masterSolutionLabel" style="font-size: 1.5vw">
+          {{_solutionIssue}}</b>
+      </div>
+      <div class="modal-body">
+
+
+        <div id="masterIssue" [style.display]="_issueSolutionCount === 0 ? 'block': 'none'">
+
+
+          <div id="searchByIssue" style="width: 100%">
+            <div class="form-group">
+              <label for="searchIssue"></label>
+              <input type="text"
+                     class="form-control"
+                     id="searchIssue"
+                     [(ngModel)]="_searchIssueValue"
+                     placeholder="{{_searchByIssue}}"/>
+            </div>
+          </div>
+          <div class="solution-master-div">
+            <div class="row">
+              <div class="col-4" *ngFor="let i of _masterIssueArray | searchIssue: _searchIssueValue">
+                <div class="card"
+                     style="margin-bottom: 5%;
+                          border: 1px solid lightgray;
+                          border-radius: 7px;
+                          cursor: pointer"
+                     (click)="assignSolution(i.id, i.issue_details, i.issue_type)">
+                  <div class="card-body">
+                    <p style="line-height: 0;font-size: 1.4vw;">
+                      {{i.issue_details}}</p>
+                    <p>{{i.issue_type}}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div [style.display]="_issueSolutionCount === 1 ? 'block': 'none'">
+
+          <div class="row">
+            <div class="col-4">
+              <div class="solution-master-div" style="border: 1px solid lightgray; border-radius: 5px">
+                <p style="font-size: 1.5vw">{{_selectedIssue}}</p>
+                <p style="line-height: 0"> {{_selectedIssueType}}</p>
+              </div>
+            </div>
+            <div class="col-8">
+              <div>
+                <form [formGroup]="createMasterSolution">
+                  <div class="row">
+                    <div class="col-12">
+
+                      <div class="form-group">
+                        <label for="solution"></label>
+                        <input type="text"
+                               class="form-control"
+                               id="solution"
+                               formControlName="solution"
+                               [style.border-bottom]="_isMasterSolutionError === 1 ||
+                                                 _isMasterSolutionError === 2 ? '2px solid red': ''"
+                               placeholder="{{_solution}}">
+                        <div [style.display]="_isMasterSolutionError === 1 ? 'block': 'none'">
+                          <span class="text-danger">{{_validationMessage}}</span>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  <div style="padding: 17px; float: left">
+                <span [style.color]="_isMasterSolutionError === 1 || _isMasterSolutionError === 3 ? 'red' : 'black'">
+                  {{_sparePartsReturnRequired}}
+                </span>
+                  </div>
+                  <div class="solution-master-div"
+                       style="text-align: center;
+                               zoom: 1.2;
+                               border-radius: 4px;"
+                       [style.border]="_isMasterSolutionError === 1 ||
+                         _isMasterSolutionError === 3 ? '1px solid red' : '1px solid lightgray'">
+
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input"
+                             type="radio"
+                             id="inlineCheckbox1"
+                             value="Yes"
+                             formControlName="spareParts">
+                      <label class="form-check-label"
+                             for="inlineCheckbox1">
+                        {{_yes}}
+                      </label>
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input class="form-check-input"
+                             type="radio"
+                             id="inlineCheckbox2"
+                             value="No"
+                             formControlName="spareParts">
+                      <label class="form-check-label"
+                             for="inlineCheckbox2">
+                        {{_no}}
+                      </label>
+                    </div>
+                  </div>
+                  <button type="button"
+                          style="margin-top: 3%;" (click)="getMasterValue()"
+                          class="btn btn-outline-info">
+                    {{_nextButton}}
+                  </button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div [style.display]="_issueSolutionCount === 2 ? 'block' : 'none'">
+          <div *ngIf="_isMusterSolutionSubmitError" class="alert alert-danger">
+            {{_wrong}}
+          </div>
+
+          <div class="row">
+            <div class="col-4">
+              <p>{{_masterSolutionJson['solution_details']}}</p>
+              <p>{{_masterSolutionJson['spare_part_return_required']}}</p>
+            </div>
+            <div class="col-8">
+              <div class="solution-master-div" style="overflow-y: scroll; height: 200px">
+                <form [formGroup]="masterSolutionVendorForm">
+                  <div formArrayName="cost_details"
+                       *ngFor="let other of masterSolutionVendorForm.get('cost_details')['controls']; let i = index">
+                    <div [formGroupName]="i">
+                      <div class="row">
+                        <div class="col-5">
+                          <div class="form-group">
+                            <label for="exampleFormControlSelect1"></label>
+                            <select class="form-control"
+                                    id="exampleFormControlSelect1"
+                                    formControlName="vendor_id"
+                                    style="padding: 10px">
+                              <option *ngFor="let vendor of _vendors" value="{{vendor.vendor_id}}">
+                                {{vendor.first_name + " " + vendor.last_name}}
+                              </option>
+                            </select>
+                          </div>
+                        </div>
+                        <div class="col-5">
+                          <div class="form-group">
+                            <label for="exampleFormControlInput1"></label>
+                            <input type="text"
+                                   class="form-control"
+                                   id="exampleFormControlInput1"
+                                   placeholder="Repair Cost"
+                                   style="margin-top: 4%"
+                                   formControlName="cost">
+                          </div>
+                        </div>
+                        <div class="col-2">
+                          <button type="button" class="btn btn-outline-danger"
+                                  (click)="removeItem(i)"
+                                  style="margin-top: 46%">
+                            <i class="fa fa-times" aria-hidden="true"></i>
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+              <div style="margin-top: 2%">
+                <button type="button"
+                        class="btn btn-outline-danger"
+                        style="margin-right: 1%"
+                        (click)="addAlternateVendor()">
+                  {{addIssue}}
+                </button>
+                <button type="button"
+                        class="btn btn-outline-info" (click)="getMasterSolution()">
+                  {{_submitButton}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div [style.display]="_issueSolutionCount === 3 ? 'block': 'none'">
+          <div *ngIf="!_isMusterSolutionSubmitError" class="alert alert-success">
+            {{_record}}
+          </div>
+        </div>
+        <button type="button"
+                class="btn btn-outline-danger"
+                data-dismiss="modal"
+                style="margin-top: 2%;margin-left: 89%;"
+                (click)="reload()">
+          {{_close}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--create solution modal end-->

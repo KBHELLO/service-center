@@ -1,0 +1,58 @@
+<div class="container-fluid" style="font-family:serif;">
+  <div style="
+  font-size: 1.5vw;
+    padding: 10px;
+    background: whitesmoke;">
+    <div class="row">
+      <div class="col-6">
+        {{_notCompleteModel}} - <span style="font-size: 1.2vw">{{_serviceCenterText}}</span>
+      </div>
+      <div class="col-6" style="text-align: right">
+        <i class="fa fa-home"
+           aria-hidden="true"
+           style="font-size: 3vw;cursor: pointer;"
+           (click)="Dashboard()"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="width: 70%;font-size: 1vw;margin: 2% auto;">
+    <table class="table table-bordered">
+      <thead>
+      <tr style="text-align: center">
+        <th>{{_modelImei}}</th>
+        <th>{{_serviceCenterText}}</th>
+        <th>{{_issue}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let model of _notCompleteModelArray let k = index">
+        <td style="text-align: center">{{model['imei']}}</td>
+        <td style="text-align: center">
+          <div *ngFor="let i of _vendorNameArray">
+            <span *ngIf="i.vendor_id === model['service_center_id']">
+              {{i.first_name + " "+ i.last_name}}
+            </span>
+          </div>
+        </td>
+        <td>
+          <table class="table table-bordered">
+            <thead>
+            <tr style="text-align: center; width: 50%;">
+              <th>{{_issuesDetails}}</th>
+              <th>{{_cost}}</th>
+            </tr>
+            </thead>
+            <tbody *ngFor="let issue of _notCompleteModelArray[k]['issues']">
+            <tr *ngIf="issue['issue_status'] === '3'">
+              <td>{{issue['issue_details']}}</td>
+              <td style="text-align: center">{{issue['repair_cost']}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -1,0 +1,254 @@
+<div class="container-fluid">
+  <div class=""
+       style="height: 50px;
+       font-size: 2vw;
+       text-align: left;background: whitesmoke">
+    <div class="row">
+      <div class="col-6">
+        <a style="font-family: serif">
+          {{_updatedApprovalIssuesHeading}}&nbsp;<span style="font-size: 1.2vw">{{_serviceText}}</span>
+        </a>
+      </div>
+      <div class="col-6" style="text-align: right">
+        <i class="fa fa-home"
+           aria-hidden="true"
+           style="font-size: 3vw;cursor: pointer;"
+           (click)="Dashboard()"></i>
+      </div>
+    </div>
+    <div class="card" *ngFor="let i of _updatedIssuesArray; let k = index"
+         style="width: 90%;
+                margin: 2% auto auto;
+                text-align: center;
+                font-family: serif;">
+      <div class="card-header">
+        <div class="row">
+          <div class="col-3">
+            {{_requestId}} - {{i['id']}}
+          </div>
+          <div class="col-3">
+            {{_modelImei}} - {{i['imei']}}
+          </div>
+          <div class="col-3">
+            {{_serviceCenter}} - {{i['service_center_id']}}
+          </div>
+          <div class="col-3">
+            <button type="button"
+                    class="btn btn-success"
+                    data-toggle="modal"
+                    data-target="#jodSheetModal"
+                    data-backdrop="static"
+                    data-keyboard="false"
+                    (click)="confirmIssues(_updatedIssuesArray[k]['issues'],_updatedIssuesArray[k]['id'])">
+              {{_confirm}}
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="card-container">
+        <table class="table table-bordered">
+          <thead>
+          <tr>
+            <th>{{_issuesId}}</th>
+            <th>{{_issuesDetails}}</th>
+            <th>{{_repairCost}}</th>
+            <th>{{_action}}</th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let j of _updatedIssuesArray[k]['issues']">
+          <tr *ngIf="j['issue_status'] === '1' || j['issue_status'] === '5'">
+            <td>{{j['id']}}</td>
+            <td>{{j['issue_details']}}</td>
+            <td>{{j['repair_cost']}}</td>
+            <td>
+              <div *ngIf="j['issue_status'] === '5'">
+                <button type="button"
+                        class="btn btn-raised btn-warning"
+                        (click)="getRejectList(j)"
+                        data-toggle="modal"
+                        data-target="#rejectModal"
+                        data-backdrop="static"
+                        data-keyboard="false">
+                  <i class="fa fa-times" aria-hidden="true"></i></button>
+              </div>
+              <div *ngIf="j['issue_status'] === '1'">
+                <i class="fa fa-check" aria-hidden="true" style="color: green;zoom: 2"></i>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--reject modal start-->
+
+<div class="modal" tabindex="-1" role="dialog" id="rejectModal" >
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header"></div>
+      <div class="modal-body" style="text-align: center">
+        <div
+          style="zoom: 3;
+          color: red;">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </div>
+        {{_deleteMessage}}
+        <div style="text-align: center;margin-top: 7%">
+          <button
+            type="button"
+            class="btn btn-raised btn-secondary"
+            data-dismiss="modal">
+            {{_cancel}}
+          </button>
+          <button
+            type="button"
+            class="btn btn-raised btn-danger"
+            (click)="updateIssue()"
+            style="margin-left: 5%">
+            {{_delete}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--reject modal end-->
+
+<!--confirm modal start-->
+
+<div class="modal fade"
+     id="confirmModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true"
+     style="font-family: 'Varela Round', sans-serif;font-size: 20px">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body" style="text-align: center">
+        <table class="table">
+          <thead>
+          <tr>
+            <th>{{_modelIssue}}</th>
+            <th>{{_modelCost}}</th>
+            <th>{{action}}</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let i of _confirmIssue" style="font-size: 15px">
+            <td>{{i['issue_details']}}</td>
+            <td>{{i['repair_cost']}}</td>
+            <td>
+              <div
+                style="color: green;">
+                <i class="fa fa-check" aria-hidden="true"></i>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <div style="text-align: center;margin-top: 7%">
+          <button
+            type="button"
+            class="btn btn-raised btn-secondary"
+            data-dismiss="modal" (click)="reload()">
+            {{_cancel}}
+          </button>
+          <button
+            type="button"
+            class="btn btn-raised btn-success"
+            style="margin-left: 5%">
+            {{_confirmText}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--confirm modal end-->
+
+
+<div class="modal fade"
+     id="jodSheetModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="font-family: Serif,serif; font-size: 1vw">
+      <div class="modal-header" style="background-color: whitesmoke;padding: 10px">
+        <h5 class="modal-title" id="exampleModalLabel">{{_printJobSheet}}</h5>
+      </div>
+      <div class="modal-body" id="print-section">
+        <div style="text-align: center;
+           background-color: #64B5F6;
+           padding: 10px;
+           font-size: 1.2vw;
+           border-radius: 4px;">
+          {{_jobDescription}}
+        </div>
+        <div *ngFor="let i of _updatedIssuesArray; let k=index">
+          <div class="row" *ngIf="i['request_status'] === '8'"
+               style="text-align: center;padding: 10px;">
+            <div class="col-6">
+              {{_modelIMEI}} - {{i['imei']}}
+            </div>
+            <div class="col-6">
+              {{_serviceCenterName}} -
+              <div *ngFor="let j of _vendorNameArray">
+              <span *ngIf="j.vendor_id === i['service_center_id']">
+                {{j.first_name +' '+ j.last_name}}
+              </span>
+              </div>
+            </div>
+          </div>
+
+          <table class="table table-bordered" *ngIf="i['request_status'] === '8'">
+            <thead>
+            <tr style="text-align: center">
+              <th>{{_serialNumber}}</th>
+              <th>{{_jobDescriptionTable}}</th>
+              <th>{{_modelCost}}</th>
+            </tr>
+            </thead>
+            <tbody *ngFor="let j of _updatedIssuesArray[k]['issues']; let ind = index;" >
+            <tr *ngIf="j['issue_status'] !== '2'">
+              <td style="text-align: center">{{ind + 1}}</td>
+              <td>{{j['issue_details']}}</td>
+              <td style="text-align: center">{{j['repair_cost']}}</td>
+            </tr>
+            </tbody>
+          </table>
+          <div class="row"
+               style="text-align: center"
+               *ngIf="i['request_status'] === '8'">
+            <div class="col-8">{{_total}}</div>
+            <div class="col-4"><b>{{getTotalCost()}}</b>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal">
+          {{_close}}
+        </button>
+        <button type="button"
+                class="btn btn-primary"
+                printSectionId="print-section"
+                (click)="confirmRequest()"
+                [useExistingCss]="true"
+                ngxPrint>
+          {{_print}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

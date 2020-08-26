@@ -1,0 +1,135 @@
+<div class="container-fluid">
+  <div class=""
+       style="height: 50px;
+       font-size: 2vw;
+       text-align: left;background: whitesmoke">
+
+    <div class="row">
+      <div class="col-6">
+        <a style="font-family: serif">
+          {{_completedModel}} - <span style="font-size: 1.2vw">{{_serviceCenterText}}</span>
+        </a>
+      </div>
+      <div class="col-6" style="text-align: right">
+        <i class="fa fa-home"
+           aria-hidden="true"
+           style="font-size: 3vw;cursor: pointer;"
+           (click)="Dashboard()"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="width: 70%; margin: 2% auto;">
+    <table class="table table-bordered">
+      <thead>
+      <tr style="text-align: center">
+        <th>{{_imei}}</th>
+        <th>{{_serviceCenter}}</th>
+        <th>{{_issuesDetails}}</th>
+        <th>{{_action}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let i of _completeModelArray; let k = index">
+      <tr style="text-align: center">
+        <td>{{i['imei']}}</td>
+        <td>
+          <div *ngFor="let j of _vendorNameArray">
+            <span *ngIf="j.vendor_id === i['service_center_id']">
+              {{j.first_name + " " + j.last_name}}
+            </span>
+          </div>
+        </td>
+        <td>
+          <table class="table table-bordered">
+            <thead>
+            <tr style="text-align: center; width: 50%;">
+              <th>{{_issue}}</th>
+              <th>{{_cost}}</th>
+            </tr>
+            </thead>
+            <tbody *ngFor="let issue of _completeModelArray[k]['issues']">
+            <tr *ngIf="issue['issue_status'] === '4'">
+              <td>{{issue['issue_details']}}</td>
+              <td style="text-align: center">{{issue['repair_cost']}}</td>
+            </tr>
+            </tbody>
+          </table>
+        </td>
+        <td>
+          <button type="button"
+                  class="btn btn-raised btn-warning btn-sm"
+                  data-toggle="modal"
+                  data-target="#exampleModal"
+                  data-backdrop="static"
+                  data-keyboard="false"
+                  aria-hidden="true" (click)="getImei(i['imei'],i['id'])">
+            {{_stock}}
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+
+<!--modal start-->
+
+<!-- Modal -->
+<div class="modal fade"
+     id="exampleModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content"
+         style="font-family: Serif,serif; font-size: 1vw;padding:10px;border: 3px solid green;">
+      <div class="modal-header">
+        <h5 class="modal-title"
+            id="exampleModalLabel">
+          <span style="font-size: 1vw">{{_confirmationMessage}}</span>
+        </h5>
+      </div>
+      <div class="modal-body">
+        <div class="alert alert-danger" [style.display]="_isChecked ? 'block': 'none'">
+          <span>{{_validationMessage}}</span>
+        </div>
+        <div class="alert alert-danger" [style.display]="!_isFound ? 'block': 'none'">
+          <span>{{_notFound}}</span>
+        </div>
+        <form [formGroup]="_imeiForm">
+          <div class="row" style="text-align: center;">
+            <div class="col-6">
+              <span>{{_allIssueSolved}}</span>
+            </div>
+            <div class="col-6">
+              <input
+                type="checkbox"
+                name="checked"
+                aria-label="Checkbox for following text input"
+                formControlName="checkValue"
+                (change)="getCheckBoxValue($event.target.checked)"
+                style="zoom:1.5;"
+                required/>
+            </div>
+          </div>
+          <div style="text-align: center; margin-top: 6%">
+            <button type="button"
+                    class="btn btn-secondary"
+                    data-dismiss="modal" (click)="reload()">
+              {{_close}}
+            </button>
+            <button type="button"
+                    class="btn btn-primary" (click)="makeStock()">
+              {{_saveChange}}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--modal end-->

@@ -1,0 +1,189 @@
+<nav class="navbar navbar-light bg-light">
+  <span class="navbar-brand mb-0 h1" style="font-size: 1.2vw; font-family: Serif,serif">
+    {{_waitingForServiceCenter}}
+    </span>
+  <button type="button"
+          class="btn btn-outline-info"
+          (click)="Dashboard()">
+    {{_dashboard}}
+  </button>
+</nav>
+<div class="container details">
+  <div [style.display]="_displayCount === 0 ? 'block' : 'none'">
+    <div class="row" style="font-family: Serif,serif;margin-top: 2%">
+      <div class="col-3" *ngFor="let waitModel of _waitingModel">
+        <div class="card" *ngIf="waitModel.request_status === '2'"
+             (click)="oneDisplayBlock(waitModel.imei,waitModel.model_name)"
+             style="cursor: pointer">
+          <div class="card-body">
+            <h5 class="card-title">{{waitModel.model_name}}</h5>
+            <h6 class="card-subtitle mb-2 text-muted">{{waitModel.imei}}</h6>
+            <div class="row card-text">
+              <div class="col-6">Color</div>
+              <div class="col-6">{{waitModel.product_color}}</div>
+              <div class="col-6">Storage</div>
+              <div class="col-6">{{waitModel.storage}}</div>
+              <div class="col-6">Price</div>
+              <div class="col-6">{{waitModel.product_price}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div [style.display]="_displayCount === 1 ? 'block' : 'none'">
+    <div class="card" style="margin-top: 2%">
+      <div class="card-body">
+        <h5 class="card-title" style="margin-left: 2%">{{_modelNameIssue}}</h5>
+        <h6 class="card-subtitle mb-2 text-muted" style="margin-left: 2%">{{_modelImei}}</h6>
+        <div class="row row-design" *ngFor="let model of _needApprovalModel">
+          <div class="col-4"><p>{{model.issue_details}}</p></div>
+          <div class="col-4"><p>{{model.solution_details}}</p></div>
+          <div class="col-4">
+            <div *ngIf="model.issue_status === '2'" style="color: red;text-align: center">
+              <i class="fa fa-times" aria-hidden="true" style="zoom: 2"></i>
+            </div>
+            <div *ngIf="model.issue_status === '1'" style="color: #4CAF50;text-align: center">
+              <i class="fa fa-check" aria-hidden="true" style="zoom: 2"></i>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top: 2%">
+          <button type="button"
+                  class="btn btn-outline-info"
+                  style="margin-left: 76%"
+                  data-toggle="modal"
+                  data-target="#jodSheetModal">
+            {{_printJobSheet}}
+          </button>
+          <button type="button"
+                  class="btn btn-outline-danger"
+                  style="margin-left: 1%"
+                  data-toggle="modal"
+                  data-target="#exampleModal">
+            {{_out}}
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--out confirm modal start-->
+
+<div class="modal fade"
+     id="exampleModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true"
+     style="font-family: Serif,serif;font-size: 1vw">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div class="background-block" style="text-align: center">
+          <div style="zoom: 3; color: #03a9f4">
+            <i class="fa fa-info-circle" aria-hidden="true"></i>
+          </div>
+          <span style="font-size: 1.1vw">{{_inOfficeConfirmation}}</span>
+        </div>
+
+        <div style="margin-top: 5%;margin-left: 65%;">
+          <button
+            type="button"
+            class="btn btn-outline-secondary"
+            data-dismiss="modal">
+            {{_cancel}}
+          </button>
+          <button
+            type="button"
+            class="btn btn-outline-info"
+            (click)="updateIssue()"
+            style="margin-left:2%">
+            {{_out}}
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--out confirm modal end-->
+
+<!--print modal start-->
+
+<div class="modal fade"
+     id="jodSheetModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="font-family: Serif,serif; font-size: 1vw">
+      <div class="modal-header" style="background-color: whitesmoke;padding: 10px">
+        <h5 class="modal-title" id="exampleModalLabel">{{_printJobSheet}}</h5>
+      </div>
+      <div class="modal-body" id="print-section">
+        <span style="font-size: 2vw;color: #183454"><strong><u>Job Sheet</u></strong></span>
+        <div class="row" style="margin-top: 2%">
+          <div class="col-6">
+            <span style="font-size: 1.3vw">{{_companyName}}</span>
+            <p>3rd floor DN 23, Street Number 10, DN Block, Sector V, Bidhannagar, Kolkata, West Bengal 700091</p>
+          </div>
+          <div class="col-6">
+            <div *ngFor="let sc of _selectedVendor">
+              <span style="font-size: 1.3vw">{{sc['first_name'] + ' ' + sc['last_name']}}</span>
+              <p>{{sc['address']}}</p>
+              <p>{{sc['phone']}}</p>
+
+            </div>
+          </div>
+        </div>
+        <table class="table table-striped">
+          <thead>
+          <tr>
+            <td>Issue</td>
+            <td>Solution</td>
+            <td>Spare Part return</td>
+            <td>Cost</td>
+          </tr>
+          </thead>
+          <tbody *ngFor="let solution of _needApprovalModel">
+          <tr *ngIf="solution.issue_status === '1'">
+            <td>{{solution.issue_details}}</td>
+            <td>{{solution.solution_details}}</td>
+            <td>{{solution.spare_part_return_required}}</td>
+            <td style="text-align: right">{{solution.cost}}</td>
+          </tr>
+          </tbody>
+        </table>
+        <div class="row">
+          <div class="col-10" style="font-size: 1.4vw;">
+            <span style="margin-left: 74%"><b>{{_total}}</b></span>
+          </div>
+          <div class="col-2" style="text-align: right;padding-right: 3%">{{getTotalCost()}}</div>
+        </div>
+      </div>
+      <div class="modal-footer" style="padding: 2%">
+        <button type="button"
+                class="btn btn-outline-danger"
+                data-dismiss="modal">
+          {{_close}}
+        </button>
+        <button type="button"
+                class="btn btn-outline-info"
+                style="margin-right: 2%;margin-left: 1%;">
+          {{_print}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--print modal end-->

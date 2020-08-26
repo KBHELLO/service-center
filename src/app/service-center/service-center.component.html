@@ -1,0 +1,147 @@
+<div class="container-fluid">
+  <div class=""
+       style="height: 50px;
+       font-size: 2vw;
+       text-align: left;padding: 10px;background: whitesmoke">
+    <a style="font-family: serif">
+      {{serviceCenter}}&nbsp;<span style="font-size: 1.2vw">{{_serviceCenterText}}</span>
+    </a>
+
+    <div style="float: right;cursor: pointer" (click)="logout()">
+      <i class="fa fa-sign-out" aria-hidden="true"></i>
+    </div>
+  </div>
+  <div class="row" style="margin-top: 1%">
+    <div class="col-2">
+      <div class="card" style="height: 150px;">
+        <div class="card-body" style="text-align: center">
+          <b style="font-size: 3vw;">
+            {{_unAssignedModelCount}}
+          </b>
+          <p (click)="assignServiceCenter()"
+             class="p-style" style="font-size: 1.2vw">
+            {{request}}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="card" style="height: 150px;">
+        <div class="card-body"
+             style="text-align: center">
+          <b *ngIf="_approvedModelArray.length === 0" style="font-size: 3vw;">0</b>
+          <b class="" style="font-size: 3vw;">
+            {{_assignModelCount}}
+          </b>
+          <p (click)="wayToOutgoingModel()"
+             class="p-style" style="font-size: 1.2vw">
+            {{_modelOutGoing}}
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="card" style="height: 150px;">
+        <div class="card-body" style="text-align: center">
+          <b *ngIf="_waitingModelArray.length === 0" style="font-size: 3vw">0</b>
+          <b class="" style="font-size: 3vw;">
+            {{_waitingModelCount}}
+          </b>
+          <p class="p-style" style="font-size: 1.2vw" (click)="wayToInOffice()">
+            {{_inOffice}}</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="card" style="height: 150px;">
+        <div class="card-body" style="text-align: center">
+          <b class="" style="font-size: 3vw;" *ngIf="_inServiceCenterCount === 0">
+            0
+          </b>
+          <b class="" style="font-size: 3vw;">
+            {{_inServiceCenterCount}}
+          </b>
+          <p class="p-style" style="font-size: 1.2vw"
+             (click)="wayToInServiceCenter()">{{_inServiceCenter}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-2">
+      <div class="card" style="height: 150px;">
+        <div class="card-body"
+             style=" text-align: center;">
+          <b style="font-size: 3vw;" *ngIf="_notCompleteModelCount === 0">
+            0
+          </b>
+          <b style="font-size: 3vw;">
+            {{_notCompleteModelCount}}
+          </b>
+          <p (click)="wayToRequestService()"
+             class="p-style" style="font-size: 1.2vw">
+            {{_assignServiceCenter}}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-2">
+      <div class="card" style="height: 150px;">
+        <div class="card-body" style="text-align: center">
+          <b class="" style="font-size: 3vw;" *ngIf="_completeModelCount === 0">
+            0
+          </b>
+          <b class="" style="font-size: 3vw;">
+            {{_completeModelCount}}
+          </b>
+          <p class="p-style"
+             style="font-size: 1.2vw"
+             (click)="wayToComplete()">
+            {{_invoice}}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!--total Model-->
+
+  <div class="row" style="margin-top: 3%; font-family: Serif,serif">
+    <div class="col-4">
+      <div class="card" style="text-align: center;font-size: 1.5vw">
+        <div class="row" style="padding-left: 15px;padding-right: 15px;height: 95px;">
+          <div class="col-8" style="margin-top: 6%">
+            <span style="margin-top: 6%">{{_totalModel}}</span>
+          </div>
+          <div class="col-4" style="margin-top: 6%">
+            <span>{{this.models.length}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-2">
+      <div class="card"
+           style="height: 95px;text-align: center;font-size: 1.3vw; cursor: pointer"
+           (click)="wayToModelInfo()">
+        <span style="margin-top: 13%">{{_modelInfo}}</span>
+      </div>
+    </div>
+
+    <div class="col-4">
+      <div class="card" style="text-align: center;font-size: 1.5vw;cursor: pointer;" (click)="wayToUpdateIssueApproval()">
+        <div class="row" style="padding-left: 15px;padding-right: 15px;height: 95px;">
+          <div class="col-8" style="margin-top: 6%">
+            <span style="margin-top: 6%">{{_approvalForUpdatedIssues}}</span>
+          </div>
+          <div class="col-4" style="margin-top: 6%">
+            <span *ngIf="_updateIssuesCount === 0">0</span>
+            <span *ngIf="_updateIssuesCount !== 0">{{_updateIssuesCount}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+

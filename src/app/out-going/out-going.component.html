@@ -1,0 +1,156 @@
+<nav class="navbar navbar-light bg-light">
+  <span class="navbar-brand mb-0 h1" style="font-size: 1.2vw; font-family: Serif,serif">
+    {{_outGoingServiceCenter}}
+    </span>
+  <button type="button"
+          class="btn btn-outline-info"
+          (click)="Dashboard()">
+    {{_dashboard}}
+  </button>
+</nav>
+<div class="container details">
+  <div class="row" style="margin-top: 2%">
+    <div class="col-3" *ngFor="let assignModel of _serviceCenterAssignedModel">
+      <div class="card card-extra-design" *ngIf="assignModel.request_status === '1'">
+        <div class="card-body card-text-style">
+          <h5 class="card-title">{{assignModel.model_name}}</h5>
+          <h6 class="card-subtitle mb-2 text-muted">{{assignModel.imei}}</h6>
+          <div class="card-body-design" style="padding: 15px">
+            <div class="row">
+              <div class="col-6">{{_color}}</div>
+              <div class="col-6">{{assignModel.product_color}}</div>
+              <div class="col-6">{{_cost}}</div>
+              <div class="col-6">{{assignModel.product_price}}</div>
+              <div class="col-6">{{_storage}}</div>
+              <div class="col-6">{{assignModel.storage}}</div>
+            </div>
+          </div>
+          <p></p>
+          <p class="card-link">
+            <button type="button"
+                    class="btn btn-outline-info"
+                    (click)="getApproveModel(assignModel.imei)"
+                    data-toggle="modal"
+                    data-target="#confirmModal"
+                    data-backdrop="static"
+                    data-keyboard="false">{{_next}}
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--confirm modal start-->
+
+<div class="modal fade"
+     id="confirmModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content" style="width: 130%;margin-left: -16%;">
+      <div class="modal-header header-card-style">
+        <h5 class="modal-title"><b>{{_issueSolutionVendorCost}}</b></h5>
+        <i class="fa fa-times-circle-o"
+           aria-hidden="true" data-dismiss="modal" style="zoom: 2;cursor: pointer"
+           (click)="modalClose()"></i>
+      </div>
+      <div class="modal-body">
+        <div class="details-small" style="padding: 15px;margin-bottom: 3%"
+             [style.display]="_modalDisplayCount === 0 ? 'block' : 'none'">
+          <div class="alert alert-danger" *ngIf="!_isEqual">
+            <span>{{_somethingWentWrong}}</span>
+          </div>
+          <div class="card"
+               *ngFor="let model of _needApprovalModel; let i = index"
+               style="margin-bottom: 2%;border-radius: 5px;">
+            <div class="card-body">
+              <h5 class="card-title">{{model.issue_details}}</h5>
+              <h6 class="card-subtitle mb-2 text-muted">{{model.imei}}</h6>
+              <div class="row card-text">
+                <div class="col-2">Solution</div>
+                <div class="col-4">{{model.solution_details}}</div>
+                <div class="col-3">Service Center</div>
+                <div class="col-3">
+                  <div *ngFor="let vendor of _vendorNameArray">
+                    <span *ngIf="+vendor.vendor_id === model.service_center_id">
+                      {{vendor.first_name + ' ' +vendor.last_name}}
+                    </span>
+                  </div>
+                </div>
+                <div class="col-2">Cost</div>
+                <div class="col-4">{{model.cost}}</div>
+                <div class="col-3">Spare Parts Return</div>
+                <div class="col-3">{{model.spare_part_return_required}}</div>
+              </div>
+            </div>
+            <form [formGroup]="remarkForm">
+              <div class="row">
+                <div class="col-6">
+                  <div class="form-group" style="padding-left: 5%">
+                    <label for="exampleFormControlTextarea1"></label>
+                    <textarea class="form-control"
+                              id="exampleFormControlTextarea1"
+                              formControlName="remarks"
+                              [style.border-bottom]="_isRemarkBlank && _formIndex === i ? '2px solid red' : ''"
+                              rows="2"
+                              placeholder="{{_remarkApprovalReject}}"></textarea>
+                    <div class="text-danger" *ngIf="_isRemarkBlank && _formIndex === i">
+                      {{_validationMessage}}
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6" >
+                  <button type="button"
+                          class="btn btn-warning bmd-btn-fab"
+                          style="margin-right: 2%;margin-top: 3%"
+                          (click)="getSelectIssue(model.issue_id, i,'reject',model.id)">
+                    <i class="fa fa-times" aria-hidden="true"></i>
+                  </button>
+                  <button type="button"
+                          class="btn btn-success bmd-btn-fab"
+                          style="margin-top: 3%"
+                          (click)="getSelectIssue(model.issue_id, i ,'approve',model.id)">
+                    <i class="fa fa-check" aria-hidden="true"></i>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="details-small" style="padding: 15px;margin-bottom: 3%"
+             [style.display]="_modalDisplayCount === 1 ? 'block' : 'none'">
+          <div *ngFor="let issue of _needApprovalModel">
+            <div class="card"
+                 style="margin-bottom: 2%;border-radius: 5px;" >
+              <div class="card-body">
+                <h5 class="card-title">{{issue.issue_details}}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">{{issue.imei}}</h6>
+
+              </div>
+            </div>
+          </div>
+          <button type="button"
+                  class="btn btn-outline-success"
+                  (click)="submittedIssue()">
+            {{_submit}}
+          </button>
+        </div>
+        <button type="button"
+                class="btn btn-outline-success"
+                style="margin-left: 91%"
+                [disabled]="_modalDisplayCount === 1"
+                (click)="submitModal()">
+          {{_submit}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--confirm modal end-->
+
+

@@ -1,0 +1,240 @@
+<div class="container-fluid">
+  <div class=""
+       style="height: 50px;
+       font-size: 2vw;
+       text-align: left;padding: 10px;background: whitesmoke">
+    <div class="row">
+      <div class="col-6">
+        <a style="font-family: serif">
+          {{_serviceCenterHeading}}&nbsp;<span style="font-size: 1.2vw">{{_serviceCenterText}}</span>
+        </a>
+      </div>
+      <div class="col-6" style="text-align: right">
+        <i class="fa fa-home"
+           aria-hidden="true"
+           style="font-size: 3vw;cursor: pointer;"
+           (click)="Dashboard()"></i>
+      </div>
+    </div>
+  </div>
+  <div class="card" style=" width: 69%;margin-top: 2%;margin-left: 16%;">
+    <table class="table table-hover">
+      <thead>
+      <tr style="text-align: center">
+        <th>{{_requestId}}</th>
+        <th>{{_imei}}</th>
+        <th>{{_action}}</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let i of _inServiceCenterModelArray let k = index"
+          style="text-align: center">
+        <td>{{i['id']}}</td>
+        <td>{{i['imei']}}</td>
+        <td>
+          <button
+            type="button"
+            class="btn  btn-primary btn-sm"
+            data-toggle="modal"
+            data-target="#checkModal"
+            (click)="getIssueId(i['id'])"
+            data-backdrop="static">{{_check}}</button>
+
+          <button type="button"
+                  class="btn btn-secondary btn-sm"
+                  data-toggle="modal"
+                  data-target="#exampleModal"
+                  data-backdrop="static"
+                  (click)="getModelIMEI(i['imei'],i['id'])"
+                  style="margin-left: 3%">
+            Add Issue
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!--check modal start-->
+
+<div class="modal fade"
+     id="checkModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     aria-hidden="true"
+     style="font-family:serif;font-size: 1vw">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-body">
+        <div>
+          <table class="table">
+            <thead>
+            <tr style="text-align: center">
+              <th>{{_modelIssue}}</th>
+              <th>{{_modelCost}}</th>
+              <th>{{_action}}</th>
+            </tr>
+            </thead>
+            <tbody *ngFor="let i of _getIssuesArray;">
+            <tr *ngIf="i['issue_status'] === '1'">
+              <td>{{i['issue_details']}}</td>
+              <td style="text-align: center">{{i['repair_cost']}}</td>
+              <td style="text-align: center">
+                <input
+                  type="checkbox"
+                  name="checked"
+                  aria-label="Checkbox for following text input"
+                  (change)="getCheckBoxValue(i['id'],$event.target.checked)"
+                  style="zoom:1.5;"/>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="card-footer" style="text-align: right">
+        <button type="button"
+                class="btn btn-danger"
+                data-dismiss="modal" (click)="reload()">
+          {{_cancel}}
+        </button>
+        <button type="button"
+                class="btn btn-raised btn-success btn-sm"
+                style="margin-left: 2%;margin-right: 2%" (click)="setAcceptIssue()">
+          {{_confirm}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--check modal end-->
+
+<!--update issues modal start-->
+
+<div class="modal fade"
+     id="exampleModal"
+     tabindex="-1"
+     role="dialog"
+     aria-labelledby="exampleModalLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header"
+           style="background-color: #4CAF50;
+           border-radius: 0;
+           padding: 10px;
+           color: white;">
+        <h5 class="modal-title" id="exampleModalLabel">Add Vendor</h5>
+        <button type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close" (click)="okayGo()">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div id="issueAndCost">
+          <div *ngIf="_previousIssues.length !== 0">
+            <div class="row"
+                 *ngFor="let previousIssue of _previousIssues"
+                 style="padding: 10px;font-size: 1vw;color: gray">
+              <div class="col-6">
+                {{previousIssue['issue_details']}}
+              </div>
+              <div class="col-6" style="text-align: center">
+                {{previousIssue['repair_cost']}}
+              </div>
+            </div>
+          </div>
+
+          <div *ngIf="_previousIssues.length === 0"
+               style="padding: 10px;text-align: center;
+               font-size: 1vw;color: gray;">
+            <span>No Previous Issues</span>
+          </div>
+
+          <form class="form" [formGroup]="ModelForm">
+            <div formArrayName="details"
+                 *ngFor="let other of ModelForm.get('details')['controls'];let i = index">
+
+              <div [formGroupName]="i">
+
+                <div class="row" style="padding: 10px; border-radius: 2px;margin-bottom: 2%">
+                  <div class="col-6">
+                    <div class="input-group mb-3">
+                      <input type="text"
+                             class="form-control"
+                             placeholder="{{issue}}"
+                             aria-label="Username"
+                             formControlName="issue_details"
+                             required
+                             aria-describedby="basic-addon1">
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div class="input-group mb-3">
+                      <input type="text"
+                             class="form-control"
+                             placeholder="{{costing}}"
+                             aria-label="Username"
+                             formControlName="repair_cost"
+                             required
+                             aria-describedby="basic-addon1">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-6">
+                <button type="button"
+                        class="btn btn-outline-info"
+                        style="margin-top: 5%; margin-left: 53%"
+                        (click)="addAlternateModels()">
+                  {{addIssue}}
+                </button>
+              </div>
+              <div class="col-6">
+                <button type="button"
+                        class="btn btn-raised btn-info"
+                        style="margin-top: 5%;"
+                        (click)="submitIssueAndCost();">
+                  {{addIssueSubmit}}
+                </button>
+              </div>
+            </div>
+          </form>
+          <!-- {{ModelForm.value | json}}-->
+        </div>
+        <!--display division start-->
+
+        <div [style.display]="_displayCount === 3 ? 'block': 'none'">
+
+          <div *ngIf="_isSubmitted === 1" class="alert alert-success" role="alert">
+            {{_record}}
+          </div>
+
+          <div *ngIf="_isSubmitted === 0" class="alert alert-danger" role="alert">
+            {{_wrong}}
+          </div>
+
+          <button type="button"
+                  class="btn btn-raised btn-info"
+                  style="margin-top: 5%;"
+                  (click)="okayGo();">
+            {{_ok}}
+          </button>
+
+        </div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--update issues modal end-->

@@ -1,0 +1,177 @@
+<div class="container-fluid" style="font-family: Serif,serif">
+  <div style="
+  font-size: 1.5vw;
+    padding: 10px;
+    background: whitesmoke;">
+    <div class="row">
+      <div class="col-6">
+        {{_modelInfoHeading}} - <span style="font-size: 1.2vw">{{_serviceCenterText}}</span>
+      </div>
+      <div class="col-6" style="text-align: right">
+        <i class="fa fa-home"
+           aria-hidden="true"
+           style="font-size: 3vw;cursor: pointer;"
+           (click)="Dashboard()"></i>
+      </div>
+    </div>
+  </div>
+
+  <div class="card"
+       style="margin-top: 2%;padding: 25px"
+       [style.display]="_displayCount === 0 ? 'block': 'none'">
+    <form [formGroup]="_imeiFormGroup">
+      <div class="card-container" style="margin-left: 25%">
+        <div *ngIf="_isError"
+             class="alert-danger"
+             style="padding: 10px;
+             width: 70%;
+             border-radius: 4px;
+             font-size: 1vw;
+             margin-bottom: 2%;">
+          {{_validationMessage}}
+        </div>
+        <div class="input-group mb-3" style="width: 70%">
+          <input type="text"
+                 class="form-control"
+                 placeholder="{{_enterImeiNumber}}"
+                 aria-label="Username"
+                 formControlName="imei"
+                 aria-describedby="basic-addon1">
+        </div>
+        <button type="button"
+                class="btn btn-raised btn-info" (click)="getImei()">
+          {{_submit}}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div class="card"
+       [style.display]="_modelDetailsArray.length !== 0 ? 'block': 'none' &&
+        _displayCount === 1 ? 'block':'none'"
+       style="margin-top: 2%">
+    <div class="card-header" style="font-size: 1.5vw">
+      {{_modelDetailsHeading}}
+      <button class="btn btn-raised btn-danger" style="float: right"
+              (click)="back()">
+       {{_back}}
+      </button>
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered"
+             *ngIf="_modelDetailsArray.length !== 0">
+        <thead style="text-align: center">
+        <tr>
+          <th>{{_requestId}}</th>
+          <th>{{_tableColNameImei}}</th>
+          <th>{{_serviceCenter}}</th>
+          <th>{{_requestStatus}}</th>
+          <th>{{_issuesDetails}}</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr *ngFor="let i of _modelDetailsArray let k = index">
+          <td style="text-align: center">{{i['id']}}</td>
+          <td style="text-align: center">{{i['imei']}}</td>
+          <td style="text-align: center">
+            <div *ngFor="let j of _vendorNameArray;">
+              <span *ngIf="j.vendor_id === i['service_center_id']">
+                {{j.first_name + j.last_name}}
+              </span>
+            </div>
+          </td>
+          <td style="text-align: center;font-size: 1vw">
+            <span
+              class="text-primary"
+              *ngIf="i['request_status'] === '1'">
+              {{_waitingForApproval}}
+            </span>
+            <span
+              class="text-danger"
+              *ngIf="i['request_status'] === '2'">
+              {{_rejectStatus}}
+            </span>
+            <span
+              class="text-info"
+              *ngIf="i['request_status'] === '3'">
+              {{_inServiceStatus}}
+            </span>
+            <span
+              class="text-success"
+              *ngIf="i['request_status'] === '4'">
+              {{_completed}}
+            </span>
+            <span
+              class="text-warning"
+              *ngIf="i['request_status'] === '5'">
+              {{_notCompleted}}
+            </span>
+            <span
+              class="text-muted"
+              *ngIf="i['request_status'] === '6'">
+              {{_solvedRequest}}
+            </span>
+            <span
+              class="text-success"
+              *ngIf="i['request_status'] === '7'">
+              {{_stock}}
+            </span>
+          </td>
+          <td>
+            <table class="table table-bordered">
+              <thead style="text-align: center">
+              <tr>
+                <th>{{_issueId}}</th>
+                <th>{{_issue}}</th>
+                <th>{{_cost}}</th>
+                <th>{{_issueStatus}}</th>
+              </tr>
+              </thead>
+              <tbody>
+              <tr *ngFor="let j of _modelDetailsArray[k]['issues']">
+                <td style="text-align: center">{{j['id']}}</td>
+                <td>{{j['issue_details']}}</td>
+                <td style="text-align: center">{{j['repair_cost']}}</td>
+                <td style="text-align: center;font-size: 1vw;">
+                  <span
+                    class="text-info"
+                    *ngIf="j['issue_status'] === '1'">
+                    {{_issueAccepted}}
+                  </span>
+                  <span
+                    class="text-danger"
+                    *ngIf="j['issue_status'] === '2'">
+                    {{_issueReject}}
+                  </span>
+                  <span
+                    class="text-warning"
+                    *ngIf="j['issue_status'] === '3'">
+                    {{_notSolved}}
+                  </span>
+                  <span
+                    class="text-success"
+                    *ngIf="j['issue_status'] === '4'">
+                    {{_solved}}
+                  </span>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+      <div *ngIf="_modelDetailsArray.length === 0"
+           class="alert-danger"
+           style="padding: 10px;
+             width: 100%;
+             border-radius: 4px;
+             font-size: 1vw;
+             margin-bottom: 2%;">
+        {{_imeiValidation}}
+      </div>
+
+    </div>
+  </div>
+</div>

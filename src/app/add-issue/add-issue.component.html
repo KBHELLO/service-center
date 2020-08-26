@@ -1,0 +1,257 @@
+<nav class="navbar navbar-light bg-light fixed-top">
+  <span style="font-size: 2vw; font-family: Serif,serif">
+    {{_addIssueSolutionsVendor}}
+  </span>
+
+  <button type="button"
+          class="btn btn-outline-danger"
+          (click)="prev()"
+          style="margin-left: 52%"
+          [style.display]="_addIssueSolutionDisplayCount === 1 ? 'block' : 'none'">
+    {{_perv}}
+  </button>
+
+  <button type="button" class="btn btn-outline-primary" (click)="goDashboard()">
+    {{_dashboard}}
+  </button>
+
+</nav>
+
+<div class="container-fluid" style="margin-top: 2%;padding: 50px">
+
+  <div style="margin-bottom: 3%;">
+
+    <button type="button"
+            class="btn btn-outline-warning"
+            style="float: right;margin-left: 1%" (click)="confirmIssueAndSolution()"
+            [style.display]="_addIssueSolutionDisplayCount === 1 || _addIssueSolutionDisplayCount === 2 ? 'none' : 'block'">
+      {{_confirm}}
+    </button>
+
+    <button type="button"
+            class="btn btn-outline-info"
+            data-toggle="modal"
+            data-target=".bd-example-modal-lg"
+            [style.display]="_addIssueSolutionDisplayCount === 1 || _addIssueSolutionDisplayCount === 2 ? 'none' : 'block'"
+            (click)="modalStatus()"
+            style="float: right">
+      {{_addIssueHeading}}
+    </button>
+
+  </div>
+  <div [style.display]="_addIssueSolutionDisplayCount === 0 ? 'block' : 'none'">
+    <div class="alert alert-info" *ngIf="_issueDetails.length === 0" style="margin-top: 5%">
+      <span>{{_noIssueSolution}}</span>
+    </div>
+    <div *ngIf="_issueDetails.length !== 0" style="margin-top: 5%">
+      <table class="table">
+        <thead>
+        <tr style="text-align: center">
+          <th>{{_issueDetailsText | uppercase}}</th>
+          <th>{{_solution | uppercase}}</th>
+          <th>{{_remarksText | uppercase}}</th>
+          <th>{{_action}}</th>
+        </tr>
+        </thead>
+        <tbody style="text-align: center">
+        <tr *ngFor="let issueSolution of _issueDetails; let index = index">
+          <td>
+            <div *ngFor="let i of _getMasterIssues">
+        <span [style.display]="i.id === +issueSolution.id ? 'block' : 'none'">
+          {{i.issue_details}}
+        </span>
+            </div>
+          </td>
+          <td>
+            <div *ngFor="let i of _masterSolutionArray">
+          <span [style.display]="i.id === +issueSolution.solution_id ? 'block' : 'none'">
+            {{i.solution_details}}
+          </span>
+            </div>
+          </td>
+          <td>{{issueSolution.remarks}}</td>
+          <td style="text-align: center">
+            <button type="button" class="btn btn-outline-warning" (click)="removeElement(index)">
+              <i class="fa fa-close"></i>
+            </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div [style.display]="_addIssueSolutionDisplayCount === 1 ? 'block' : 'none'">
+    <div class="row" style="margin-top: 3%">
+      <div class="col-7" style="border-radius: 5px;
+                                padding: 15px">
+        <div class="alert alert-info" [style.display]="_issueDetails.length === 0 ? 'block' : 'none'">
+          {{_noIssueSolution}}
+        </div>
+        <div class="details" [style.display]="_issueDetails.length !== 0 ? 'block' : 'none'">
+          <div class="card" *ngFor="let details of _issueDetails" style="margin-bottom: 2%">
+            <div class="card-body">
+              <div *ngFor="let i of _getMasterIssues">
+                <p [style.display]="i.id === +details.id ? 'block' : 'none'" style="font-size: 1.5vw">
+                  {{i.issue_details}}
+                </p>
+              </div>
+              <div *ngFor="let i of _masterSolutionArray">
+                <p [style.display]="i.id === +details.solution_id ? 'block' : 'none'"
+                   style="line-height: .7;
+                          font-size: 1.1vw">
+                  {{i.solution_details}}
+                </p>
+              </div>
+              <p style="line-height: .6">{{details.remarks}}</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-5">
+
+        <div class="vendorDetails" [style.display]="_issueDetails.length === 0 ? 'none' : 'block'">
+          <div class="card" *ngFor="let sc of serviceCenter" style="margin-bottom: 2%">
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6">
+                  <div *ngFor="let vendor of _vendors">
+                    <p *ngIf="+vendor.vendor_id === sc.vendor_id" style="font-size: 1.5vw">
+                      {{vendor.first_name + ' ' + vendor.last_name}}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <button type="button"
+                          class="btn btn-outline-info btn-sm"
+                          style="float: right" (click)="serviceRequest(sc.vendor_id)">
+                    {{_tableVendorButton}}
+                  </button>
+                </div>
+              </div>
+              <div *ngFor="let costDetails of sc.cost_details">
+                <div class="row">
+                  <div class="col-6">
+                    <div *ngFor="let sol of _masterSolutionArray">
+                      <p *ngIf="costDetails['solution_id'] === sol.id">{{sol.solution_details }}</p>
+                    </div>
+                  </div>
+                  <div class="col-6">
+                    <div *ngFor="let sol of _masterSolutionArray">
+                      <p *ngIf="costDetails['solution_id'] === sol.id">
+                        {{costDetails['cost']}}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div [style.display]="_addIssueSolutionDisplayCount === 2 ? 'block' : 'none'">
+    <div class="box-design-success" *ngIf="_isServiceRequestError">
+      <i class="fa fa-check-circle font-design-success" aria-hidden="true"></i>
+      <p class="text-design-success">{{_submitAddedSuccessful}}</p>
+      <button type="button"
+              (click)="back()"
+              class="btn btn-outline-success">
+        {{_back}}
+      </button>
+    </div>
+    <div class="box-design-danger" *ngIf="!_isServiceRequestError">
+      <i class="fa fa-times-circle-o font-design-danger" aria-hidden="true"></i>
+      <p class="text-design-danger">{{_somethingWentWrong}}</p>
+      <button type="button"
+              (click)="wrong()"
+              class="btn btn-outline-danger">
+        {{tryAgain}}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!--assign issue and solution modal start-->
+<div class="modal fade bd-example-modal-lg"
+     tabindex="-1" role="dialog"
+     aria-labelledby="myLargeModalLabel"
+     data-backdrop="static"
+     data-keyboard="false"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form [formGroup]="solutionForm">
+        <div [style.display]="_displayCount === 0 ? 'block' : 'none'" style="padding: 20px">
+          <div class="form-group" style="margin-top: 4%">
+            <label for="issueMater">{{_selectIssue}}</label>
+            <select class="form-control" id="issueMater" formControlName="id" style="padding: 10px ">
+              <option *ngFor="let issue of _getMasterIssues" value="{{issue.id}}">{{issue.issue_details}}</option>
+            </select>
+            <div class="alert-danger" *ngIf="_isIssueError">{{_validationMessage}}</div>
+          </div>
+          <button type="button"
+                  class="btn btn-outline-danger"
+                  data-dismiss="modal"
+                  style="margin-right: 1%;margin-left: 78%">
+            {{_close}}
+          </button>
+          <button type="button"
+                  class="btn btn-outline-success"
+                  (click)="setMaterIssue()">
+            {{_next}}
+          </button>
+        </div>
+        <div [style.display]="_displayCount === 1 ? 'block': 'none'" style="padding: 20px">
+          <div class="row">
+            <div class="col-6">
+              <div class="form-group">
+                <label for="solutionMaster">{{_selectSolution}}</label>
+                <select class="form-control"
+                        id="solutionMaster"
+                        formControlName="solution_id"
+                        style="padding: 10px">
+                  <option *ngFor="let solution of _getSolutionOfIssue" value="{{solution.id}}">
+                    {{solution.solution_details}}</option>
+                </select>
+                <div class="alert-danger" *ngIf="_isSolutionError">{{_validationMessage}}</div>
+              </div>
+            </div>
+            <div class="col-6">
+              <div class="form-group">
+                <label for="remarks"></label>
+                <textarea class="form-control" id="remarks" rows="3" placeholder="{{_remarks | titlecase}}"
+                          formControlName="remarks" style="height: 45px"></textarea>
+                <div class="alert-danger" *ngIf="_isRemarksError">{{_validationMessage}}</div>
+              </div>
+            </div>
+          </div>
+          <button type="button"
+                  class="btn btn-outline-danger"
+                  data-dismiss="modal"
+                  style="margin-right: 1%;margin-left: 66%">
+            {{_close}}
+          </button>
+          <button type="button"
+                  class="btn btn-outline-success"
+                  (click)="previousPage()">
+            {{_back}}
+          </button>
+          <button type="button"
+                  class="btn btn-outline-danger"
+                  data-dismiss="modal"
+                  style="margin-left: 1%"
+                  (click)="submitSolution()">
+            {{_submit}}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+<!--assign issues and solution modal end-->
+
+
+
+
